@@ -9,5 +9,32 @@
   "hideReplies": "Hide replies",
   "votes": "{count, plural, =0 {no votes} one {# vote} other {# votes}}",
   "edited": "edited",
-  "viewOnHive": "View on Hive"
+  "viewOnHive": "View on Hive",
+  "composer": {
+    "placeholder": "What's up? Clip, photo, idea…",
+    "replyPlaceholder": "Write a reply",
+    "post": "Post",
+    "reply": "Reply",
+    "cancel": "Cancel",
+    "posting": "Posting…",
+    "addImage": "Add image",
+    "removeImage": "Remove image",
+    "uploading": "Uploading image…",
+    "uploadFailed": "Couldn't upload the image.",
+    "login": "Log in to post",
+    "loginTitle": "Log in to post",
+    "charsLeft": "{count} left",
+    "posted": "Posted. It shows up in the feed in a few seconds.",
+    "dryRun": "Test mode: checked and signed, but not published to Hive."
+  },
+  "errors": {
+    "notConnected": "Log in to post.",
+    "tooFast": "You're posting too fast. Try again in a few minutes.",
+    "blocked": "This account can't post here.",
+    "notInFeed": "That post isn't in this feed anymore.",
+    "unavailable": "Couldn't reach Hive. Try again.",
+    "authExpired": "The signature expired. Try again.",
+    "rejected": "Hive didn't accept the post. Try again.",
+    "failed": "Couldn't post. Try again."
+  }
 }

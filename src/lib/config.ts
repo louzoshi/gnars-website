@@ -354,6 +354,15 @@ export const HIVE_FEED = {
   tag: "gnars",
   /** Value of json_metadata.app on posts made through the site. */
   app: "gnars.com",
+  /**
+   * Moderation, by hand until there is a moderation screen. `hidden` drops an entry and its
+   * thread from the feed (`author/permlink`, as in "Ver na Hive" links); `blockedAddresses`
+   * stops a member from publishing (lowercase).
+   */
+  hidden: [] as readonly string[],
+  blockedAddresses: [] as readonly string[],
+  /** Per-member publish limit (posts + comments). */
+  rateLimit: { limit: 5, windowSeconds: 600 },
 } as const;
 
 function parseHiveRef(raw: string | undefined): { author: string; permlink: string } | null {

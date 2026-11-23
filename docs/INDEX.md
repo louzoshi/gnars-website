@@ -27,7 +27,7 @@ This is the canonical entry point for project documentation. Everything below sh
 - `docs/features/tv.md` — Gnars TV data flow, UX, and mini-app integration
 - `docs/features/tv-infinite-menu.md` — 3D sphere menu integration details
 - `docs/features/feed.md` — live feed components and integration notes
-- `docs/features/hive-feed.md` — /community/hive: Hive feed with email-only (lite) posting through a shared Gnars account; trust model, container, status
+- `docs/features/hive-feed.md` — /community/hive: Hive feed with email-only (lite) posting through a shared Gnars account; trust model, publish route, moderation, go-live checklist
 - `docs/features/coin-proposal.md` — coin proposal wizard
 - `docs/features/buy-coin-transaction.md` — proposal transaction type for buy-coin
 - `docs/features/store-checkout.md` — signed USDC checkout, durable payment claims, readiness, and tracking

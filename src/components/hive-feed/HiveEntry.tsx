@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { formatDistanceToNow } from "date-fns";
-import { ExternalLink, MessageCircle, ThumbsUp } from "lucide-react";
+import { ExternalLink, MessageCircle, Reply, ThumbsUp } from "lucide-react";
 import { Markdown } from "@/components/common/Markdown";
 import { AddressDisplay } from "@/components/ui/address-display";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { hiveAvatarUrl, hiveEntryUrl, normalizeHiveBody } from "@/lib/hive/body"
 import type { HiveFeedAuthor, HiveFeedEntry } from "@/lib/hive/discussion";
 import { getDateFnsLocale } from "@/lib/i18n/format";
 import { cn } from "@/lib/utils";
+import { HiveComposer } from "./HiveComposer";
 
 function Author({ author }: { author: HiveFeedAuthor }) {
   if (author.kind === "member") {
@@ -37,10 +38,20 @@ function Author({ author }: { author: HiveFeedAuthor }) {
 }
 
 /** One post or reply, with its thread. Depth only changes spacing; threads stay readable at 320 px. */
-export function HiveEntry({ entry, depth = 0 }: { entry: HiveFeedEntry; depth?: number }) {
+export function HiveEntry({
+  entry,
+  depth = 0,
+  canReply = false,
+}: {
+  entry: HiveFeedEntry;
+  depth?: number;
+  /** The feed is connected to Hive, so replies can be published. */
+  canReply?: boolean;
+}) {
   const t = useTranslations("hiveFeed");
   const locale = useLocale();
   const [open, setOpen] = useState(depth > 0);
+  const [replying, setReplying] = useState(false);
   const when = formatDistanceToNow(new Date(entry.createdAt), {
     addSuffix: true,
     locale: getDateFnsLocale(locale),
@@ -85,6 +96,18 @@ export function HiveEntry({ entry, depth = 0 }: { entry: HiveFeedEntry; depth?: 
             </span>
           )
         )}
+        {canReply && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 cursor-pointer gap-1 px-2 text-xs"
+            aria-expanded={replying}
+            onClick={() => setReplying((v) => !v)}
+          >
+            <Reply className="size-3.5" aria-hidden />
+            {t("composer.reply")}
+          </Button>
+        )}
         <a
           href={hiveEntryUrl(entry.hiveAuthor, entry.permlink)}
           target="_blank"
@@ -96,10 +119,18 @@ export function HiveEntry({ entry, depth = 0 }: { entry: HiveFeedEntry; depth?: 
         </a>
       </footer>
 
+      {replying && (
+        <HiveComposer
+          parent={{ author: entry.hiveAuthor, permlink: entry.permlink }}
+          onDone={() => setReplying(false)}
+          autoFocus
+        />
+      )}
+
       {open && entry.replies.length > 0 && (
         <div className={cn("mt-1 border-l pl-3", depth < 3 && "sm:pl-4")}>
           {entry.replies.map((r) => (
-            <HiveEntry key={r.id} entry={r} depth={depth + 1} />
+            <HiveEntry key={r.id} entry={r} depth={depth + 1} canReply={canReply} />
           ))}
         </div>
       )}

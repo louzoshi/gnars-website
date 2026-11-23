@@ -29,13 +29,48 @@ log in with email (thirdweb in-app wallet), like SkateHive's lite accounts. Cald
 - `src/components/hive-feed/` — page body and the entry/thread component
 - `messages/{en,pt-br}/hiveFeed.json`
 
+## Publishing
+
+1. `HiveComposer` (post, or reply under any entry) attaches an image through Pinata as a
+   markdown image, then `useHivePublish` signs `{ kind, body, parent? }` with
+   `signWalletRequest` — silent for email wallets — and POSTs `{ payload, authorization }`.
+2. `POST /api/hive-feed/publish` checks, in order: feed configured (else 503), per-IP limit,
+   payload (`hivePublishPayloadSchema`), wallet signature (`verifyWalletAuthorization`),
+   `blockedAddresses`, the member's entries in the last 10 min read from Hive itself
+   (`countRecentByMember`, so it holds across instances), and for comments that the parent is
+   inside the container.
+3. `buildHiveCommentOperation` makes the `comment` op; its permlink comes from the request
+   nonce, so a replayed request rewrites the same entry instead of posting twice.
+4. With `HIVE_POSTING_KEY` set (and `HIVE_FEED_DRY_RUN` not `1`) it broadcasts with
+   `@hiveio/dhive` and revalidates `hive-feed`; otherwise it returns `{ dryRun, operation }`
+   and the composer says so.
+
+Error statuses map to translated messages on the client (`errors.*` in `hiveFeed.json`).
+
+## Moderation
+
+By hand in `HIVE_FEED` (deploy to apply): `hidden` (entry ids, drops the thread) and
+`blockedAddresses`. Limit: `rateLimit` (5 per 10 min per member).
+
 ## Status
 
-Built: read-only feed. Not built yet: composer, signed publish route, per-address rate limit,
-hide list. Blocked on the Gnars Hive account (creation, RC via HP delegation, posting key in
-Vercel). The route is not linked from the nav until posting works.
+Built: feed, composer, replies, signed publish route with dry run. Verified with
+`scripts/hive-publish-check.ts` (dry run) and an offline signature check. Not verified: the
+composer while logged in (needs a real email login) and a real broadcast. Blocked on the Gnars
+Hive account (creation, RC via HP delegation, posting key in Vercel) and on creating the
+container post. The route is not linked from the nav until posting works.
 
-Local preview with real data: `HIVE_FEED_CONTAINER=peak.snaps/<snap-container-…> pnpm dev`.
+Local preview with real data:
+`HIVE_FEED_DRY_RUN=1 HIVE_FEED_ACCOUNT=peak.snaps HIVE_FEED_CONTAINER=peak.snaps/<snap-container-…> pnpm dev`.
+
+## Go-live checklist
+
+1. Create the Gnars Hive account; delegate HP so it has RC to post.
+2. Publish the container post from it (any Hive client) and note its permlink.
+3. Vercel (server-only): `HIVE_FEED_ACCOUNT`, `HIVE_FEED_CONTAINER=<account>/<permlink>`,
+   `HIVE_POSTING_KEY` (posting key only).
+4. Post and reply once from an email login on production; check it on peakd.
+5. Link the route from the nav.
 
 ## Limits to keep in mind
 

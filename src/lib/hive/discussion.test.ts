@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { authorOf, buildFeed, type HiveDiscussionNode } from "./discussion";
+import { authorOf, buildFeed, countRecentByMember, type HiveDiscussionNode } from "./discussion";
 
 const ROOT = { author: "gnars.feed", permlink: "container" };
 const ADDR = "0x1234567890abcdef1234567890abcdef12345678";
@@ -118,5 +118,35 @@ describe("buildFeed", () => {
 
   it("returns nothing when the container is missing", () => {
     expect(buildFeed({}, ROOT, { feedAccount: null })).toEqual([]);
+  });
+});
+
+describe("countRecentByMember", () => {
+  const meta = (address: string) => ({ gnars: { address } });
+  const OTHER = "0x00000000000000000000000000000000000000aa";
+  const discussion: Record<string, HiveDiscussionNode> = {
+    "gnars.feed/a": node("gnars.feed", "a", "gnars.feed/container", "2026-01-01T00:09:00", {
+      json_metadata: meta(ADDR),
+    }),
+    "gnars.feed/b": node("gnars.feed", "b", "gnars.feed/a", "2026-01-01T00:05:00", {
+      json_metadata: meta(ADDR),
+    }),
+    "gnars.feed/old": node("gnars.feed", "old", "gnars.feed/container", "2025-12-31T00:00:00", {
+      json_metadata: meta(ADDR),
+    }),
+    "gnars.feed/c": node("gnars.feed", "c", "gnars.feed/container", "2026-01-01T00:08:00", {
+      json_metadata: meta(OTHER),
+    }),
+    "mallory/d": node("mallory", "d", "gnars.feed/container", "2026-01-01T00:08:00", {
+      json_metadata: meta(ADDR),
+    }),
+  };
+
+  it("counts the member's recent entries, posts and comments, from the shared account only", () => {
+    const since = Date.parse("2026-01-01T00:00:00Z");
+    expect(
+      countRecentByMember(discussion, "gnars.feed", ADDR.toUpperCase().replace("0X", "0x"), since),
+    ).toBe(2);
+    expect(countRecentByMember(discussion, "gnars.feed", OTHER, since)).toBe(1);
   });
 });

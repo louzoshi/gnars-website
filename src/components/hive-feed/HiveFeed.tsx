@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { HiveFeedResult } from "@/services/hive-feed";
+import { HiveComposer } from "./HiveComposer";
 import { HiveEntry } from "./HiveEntry";
 
 export async function HiveFeed({ feed }: { feed: HiveFeedResult }) {
@@ -21,10 +22,12 @@ export async function HiveFeed({ feed }: { feed: HiveFeedResult }) {
             <AlertDescription>{t("error")}</AlertDescription>
           </Alert>
         )}
+        {feed.status === "ok" && feed.canPost && <HiveComposer />}
         {feed.status === "ok" && feed.entries.length === 0 && (
           <p className="text-sm text-muted-foreground">{t("empty")}</p>
         )}
-        {feed.status === "ok" && feed.entries.map((e) => <HiveEntry key={e.id} entry={e} />)}
+        {feed.status === "ok" &&
+          feed.entries.map((e) => <HiveEntry key={e.id} entry={e} canReply={feed.canPost} />)}
       </div>
     </div>
   );

@@ -116,3 +116,24 @@ export function buildFeed(
     .filter((e): e is HiveFeedEntry => e !== null)
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
+
+/**
+ * How many entries the shared account published for `member` since `sinceMs`, read from the
+ * discussion itself, so the limit holds across server instances (the in-memory limiter
+ * doesn't).
+ */
+export function countRecentByMember(
+  discussion: Record<string, HiveDiscussionNode>,
+  feedAccount: string,
+  member: string,
+  sinceMs: number,
+): number {
+  const target = member.toLowerCase();
+  let count = 0;
+  for (const node of Object.values(discussion)) {
+    if (Date.parse(asUtcIso(node.created)) < sinceMs) continue;
+    const author = authorOf(node, feedAccount);
+    if (author.kind === "member" && author.address.toLowerCase() === target) count++;
+  }
+  return count;
+}
