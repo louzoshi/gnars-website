@@ -331,3 +331,32 @@ export const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.gnars.c
 export const BUILDER_CODE = "bc_r8lhotn0" as const;
 export const BUILDER_CODE_SUFFIX =
   "0x62635f72386c686f746e300b0080218021802180218021802180218021" as const;
+
+/**
+ * Hive community feed (/community/hive). Lite users (email login, no Hive key) publish
+ * through one shared Gnars Hive account; the feed is every reply under one container post,
+ * like SkateHive's snaps. Hive caps an account at one root post per 5 min but a reply every
+ * 3 s, which is why posts are replies and not root posts.
+ *
+ * Server-only env, so the account can be swapped without a deploy of the client bundle:
+ * - `HIVE_FEED_ACCOUNT`   — the shared posting account (lite posts are trusted only from it)
+ * - `HIVE_FEED_CONTAINER` — `author/permlink` of the container post
+ * - `HIVE_POSTING_KEY`    — that account's POSTING key (never active/owner); read only by
+ *                           the publish route
+ * Unset container → the page says the feed is not set up yet.
+ */
+export const HIVE_FEED = {
+  account: process.env.HIVE_FEED_ACCOUNT?.trim() || null,
+  container: parseHiveRef(process.env.HIVE_FEED_CONTAINER),
+  /** Public Hive API nodes, tried in order. */
+  nodes: ["https://api.hive.blog", "https://api.deathwing.me", "https://api.openhive.network"],
+  /** Tag every post carries, for discovery from other Hive apps. */
+  tag: "gnars",
+  /** Value of json_metadata.app on posts made through the site. */
+  app: "gnars.com",
+} as const;
+
+function parseHiveRef(raw: string | undefined): { author: string; permlink: string } | null {
+  const [author, permlink, ...rest] = (raw ?? "").trim().replace(/^@/, "").split("/");
+  return author && permlink && rest.length === 0 ? { author, permlink } : null;
+}

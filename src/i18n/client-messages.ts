@@ -10,7 +10,7 @@ export const ROUTE_NAMESPACES = {
   base: ["auctions", "base", "droposals", "newhome", "swap"],
   blogs: ["blogs"],
   "coin-proposal": ["coinProposal", "proposals", "propose"],
-  community: ["bounties"],
+  community: ["bounties", "hiveFeed"],
   "create-coin": ["createCoin"],
   droposals: ["droposals"],
   feed: ["feed"],

@@ -1,0 +1,13 @@
+{
+  "title": "Community feed",
+  "description": "Posts from the Gnars crew, published on Hive.",
+  "unconfigured": "The feed isn't connected to Hive yet.",
+  "error": "Couldn't load the feed from Hive. Try again in a minute.",
+  "empty": "No posts yet.",
+  "replies": "{count, plural, =0 {no replies} one {# reply} other {# replies}}",
+  "showReplies": "Show replies",
+  "hideReplies": "Hide replies",
+  "votes": "{count, plural, =0 {no votes} one {# vote} other {# votes}}",
+  "edited": "edited",
+  "viewOnHive": "View on Hive"
+}
